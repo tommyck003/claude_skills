@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.3" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <URI>\PodcastToNotionBot</URI>
+    <Description>Podcast-to-Notion Telegram bot. Long-polls Telegram and runs the summarize-to-Notion pipeline. Restarts on logon, unlock, and resume-from-sleep.</Description>
+  </RegistrationInfo>
+  <Principals>
+    <Principal id="Author">
+      <UserId><WINDOWS_SID></UserId>
+      <LogonType>InteractiveToken</LogonType>
+    </Principal>
+  </Principals>
+  <Settings>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RestartOnFailure>
+      <Interval>PT1M</Interval>
+      <Count>3</Count>
+    </RestartOnFailure>
+    <IdleSettings>
+      <Duration>PT10M</Duration>
+      <WaitTimeout>PT1H</WaitTimeout>
+      <StopOnIdleEnd>false</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+  </Settings>
+  <Triggers>
+    <LogonTrigger>
+      <UserId><WINDOWS_DOMAIN>\<USERNAME></UserId>
+    </LogonTrigger>
+    <SessionStateChangeTrigger>
+      <UserId><WINDOWS_DOMAIN>\<USERNAME></UserId>
+      <StateChange>SessionUnlock</StateChange>
+    </SessionStateChangeTrigger>
+    <EventTrigger>
+      <Subscription>&lt;QueryList&gt;&lt;Query Id="0" Path="System"&gt;&lt;Select Path="System"&gt;*[System[Provider[@Name='Microsoft-Windows-Power-Troubleshooter'] and (EventID=1)]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;</Subscription>
+    </EventTrigger>
+  </Triggers>
+  <Actions Context="Author">
+    <Exec>
+      <Command><HOME_PATH>\AppData\Local\Python\pythoncore-3.14-64\pythonw.exe</Command>
+      <Arguments>"<HOME_PATH>\.claude\skills\podcast-to-notion\telegram_bot.py"</Arguments>
+      <WorkingDirectory><HOME_PATH>\.claude\skills\podcast-to-notion</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
